@@ -1,4 +1,4 @@
-import { CustomError } from "../errors/customError.error";
+import { CustomResponseData } from "../responseData/customResponseData";
 import { OrderDetailsEntity } from "./orderDetails.entity";
 import { UserEntity } from "./user.entity";
 
@@ -22,8 +22,8 @@ export class OrderEntity {
         const{id, userId, isPaid, createdAt, total, unitTotal, user, orderDetails} = object;
 
         // Se puede hacer validaciones
-        if(!user.id) throw CustomError.badRequest('El usuario no existe');
-        if(!Array.isArray(orderDetails)) throw CustomError.badRequest('Los detalles deben ser un arreglo');
+        if(!user.id) throw CustomResponseData.badRequest('El usuario no existe');
+        if(!Array.isArray(orderDetails)) throw CustomResponseData.badRequest('Los detalles deben ser un arreglo');
 
         const orderDetailsEntity = orderDetails.map(order => OrderDetailsEntity.objectDetails(order))
         const userEntity = UserEntity.objectUser(user);

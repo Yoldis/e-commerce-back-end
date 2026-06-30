@@ -1,6 +1,4 @@
-import { CustomError } from "../errors/customError.error";
-
-
+import { CustomResponseData } from "../responseData/customResponseData";
 
 export class UserEntity {
 
@@ -9,15 +7,16 @@ export class UserEntity {
         public readonly name:string,
         public readonly email:string,
         public readonly role:string,
+        public readonly createdAt:string,
     ) {}
 
     static objectUser(object:{[key:string]:any}):UserEntity{
 
-        const {id, name, email, role} = object;
+        const {id, name, email, role, createdAt} = object;
 
         // Aqui podemos hacer validaciones de entrada
-        if(!id) throw CustomError.badRequest('El id no existe');
+        if(!id) throw CustomResponseData.badRequest('El id no existe');
 
-        return new UserEntity(id, name, email, role);
+        return new UserEntity(id, name, email, role, createdAt);
     }
 }

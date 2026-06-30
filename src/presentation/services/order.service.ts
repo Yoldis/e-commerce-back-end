@@ -1,5 +1,5 @@
 import { prisma } from "../../db/prismaClient";
-import { CreateOrderDto, CustomError } from "../../domain";
+import { CreateOrderDto, CustomResponseData } from "../../domain";
 import { OrderEntity } from '../../domain/entities/order.entity';
 
 
@@ -13,7 +13,7 @@ export class OrderService {
         try {
             if(dataDto.id) {
                 const existOrder = await prisma.order.findUnique({where:{id:dataDto.id}});
-                if(!existOrder) throw CustomError.badRequest('La orden no existe');
+                if(!existOrder) throw CustomResponseData.badRequest('La orden no existe');
 
                 await prisma.order.update({
                     where:{id:dataDto.id},
@@ -117,11 +117,11 @@ export class OrderService {
     }
 
 
-    public async getOrdersByUser(userId:string) {
+    public async getOrdersByUser(userId:number) {
 
         try {
             const user = await prisma.user.findUnique({where:{id:userId}});
-            if(!user) throw CustomError.badRequest("El usuario no existe");
+            if(!user) throw CustomResponseData.badRequest("El usuario no existe");
 
             const orders = await prisma.order.findMany({
                 where:{userId},
@@ -154,12 +154,12 @@ export class OrderService {
     }
 
 
-    public async getOrdersByAdmin(userId:string) {
+    public async getOrdersByAdmin(userId:number) {
 
         try {
-            const user = await prisma.user.findUnique({where:{id:userId}});
-            if(!user) throw CustomError.badRequest("El usuario no existe");
-            if(user.role !== 'Admin') throw CustomError.badRequest("El usuario no tiene permisos");
+            const user = await prisma.user.findUnique({where:{id:userId}, include:{role:true}});
+            if(!user) throw CustomResponseData.badRequest("El usuario no existe");
+            if(user.role.nombre !== 'Admin') throw CustomResponseData.badRequest("El usuario no tiene permisos");
 
             const orders = await prisma.order.findMany({
                 select:{

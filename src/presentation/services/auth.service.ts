@@ -1,9 +1,8 @@
 import { BcryptAdapter } from "../../config";
 import { prisma } from "../../db/prismaClient";
-import { CustomError, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
+
+import { CustomResponseData, LoginUserDto, RegisterUserDto, UpdateUserDto, UserEntity } from "../../domain";
 import { JwtAdapter } from '../../config/jwt.adapter';
-
-
 
 export class AuthService {
     
@@ -12,7 +11,7 @@ export class AuthService {
 
         try {
             const existUser = await prisma.user.findUnique({where:{email:dataDto.email}});
-            if(existUser) throw CustomError.unAuthorized('El usuario ya existe');
+            if(existUser) throw CustomResponseData.unAuthorized('El usuario ya existe');
 
             // Hash passowrd
             const passwordHash = BcryptAdapter.generateHash(dataDto.password);
@@ -21,13 +20,14 @@ export class AuthService {
                 data:{
                     email:dataDto.email,
                     name:dataDto.name,
-                    password:passwordHash 
+                    password:passwordHash,
+                    roleId:dataDto.roleId
                 }
             })
             
             // Generar token
             const token = await JwtAdapter.generateToken({id:user.id});
-            if(!token) throw CustomError.unAuthorized('Error al generar token');
+            if(!token) throw CustomResponseData.unAuthorized('Error al generar token');
 
             const userEntity = UserEntity.objectUser(user);
 
@@ -40,21 +40,20 @@ export class AuthService {
             throw error
         }
     }
-
 
     public async logiUser (dataDto:LoginUserDto) {
 
         try {
             const user = await prisma.user.findUnique({where:{email:dataDto.email}});
-            if(!user) throw CustomError.unAuthorized('El usuario no existe');
+            if(!user) throw CustomResponseData.unAuthorized('El usuario no existe');
 
             // Comprobar password
             const isCorrect = BcryptAdapter.compareHash(dataDto.password, user.password);
-            if(!isCorrect) throw CustomError.unAuthorized('Usuario o Contrasena incorrecta');
+            if(!isCorrect) throw CustomResponseData.unAuthorized('Usuario o Contrasena incorrecta');
 
             // Generar token
             const token = await JwtAdapter.generateToken({id:user.id});
-            if(!token) throw CustomError.unAuthorized('Error al generar token');
+            if(!token) throw CustomResponseData.unAuthorized('Error al generar token');
 
             const userEntity = UserEntity.objectUser(user);
 
@@ -68,15 +67,14 @@ export class AuthService {
         }
     }
 
-
     public async validateToken(token:string) {
 
         try {
             const verifyToken = await JwtAdapter.decodeToken(token);
-            if(!verifyToken) CustomError.unAuthorized('Token invalido');
+            if(!verifyToken ) throw CustomResponseData.unAuthorized('Token invalido');
 
             const user = await prisma.user.findUnique({where:{id:verifyToken?.id}});
-            if(!user) throw CustomError.unAuthorized('Usuario no existe');
+            if(!user) throw CustomResponseData.unAuthorized('Usuario no existe');
 
             const userEntity = UserEntity.objectUser(user);
 
@@ -88,8 +86,6 @@ export class AuthService {
             throw error;
         }
     }
-
-
     
     public async updateUser(dataDto:UpdateUserDto) {
         try {
@@ -99,7 +95,7 @@ export class AuthService {
             })
 
             const user = await prisma.user.findUnique({where:{id:dataDto.userId}});
-            if(!user) throw CustomError.badRequest('El Usuario no existe');
+            if(!user) throw CustomResponseData.badRequest('El Usuario no existe');
 
             const userEntity = UserEntity.objectUser(user);
 
@@ -111,18 +107,14 @@ export class AuthService {
             throw error;
         }
     }
-
-
       
-    public async getUsers(userId:string) {
+    public async getUsers(userId:number) {
         try {
-            const user = await prisma.user.findUnique({where:{id:userId}});
-            if(!user) throw CustomError.badRequest("El usuario no existe");
-            if(user.role !== 'Admin') throw CustomError.badRequest("El usuario no tiene permisos");
+            const user = await prisma.user.findUnique({where:{id:userId}, include:{role:true}});
+            if(!user) throw CustomResponseData.badRequest("El usuario no existe");
+            if(user.role.nombre !== 'Admin') throw CustomResponseData.badRequest("El usuario no tiene permisos");
 
             const users = await prisma.user.findMany();
-
-            
             const userEntity = users.map(user => UserEntity.objectUser(user));
 
             return {

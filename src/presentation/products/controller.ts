@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { ProductsService } from '../services/products.service';
 import { handleError } from '../helpers';
 

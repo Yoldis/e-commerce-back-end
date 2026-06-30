@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { LoginUserDto, RegisterUserDto, UpdateUserDto } from '../../domain';
 import { handleError } from '../helpers';
@@ -74,7 +74,7 @@ export class AuthController {
             return;
         }
 
-        this.authService.getUsers(userId!)
+        this.authService.getUsers(+userId!)
         .then(data => res.status(200).json(data))
         .catch(error => handleError(error, res))
     }

@@ -2,34 +2,48 @@
   "name": "e-commerce-backend",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "build": "rimraf ./dist && tsc",
     "start": "npm run build && node dist/app.js",
-    "seed": "ts-node src/seed/seed-database.ts"
+    "seed": "tsx src/seed/seed-database.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "yoldys",
   "license": "ISC",
-  "description": "",
+  "description": "1. Instalar los modulos de node: \"npm install\".",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
-    "@types/node": "^22.7.9",
+    "@types/node": "^22.20.0",
+    "@types/pg": "^8.20.0",
     "nodemon": "^3.1.7",
-    "prisma": "^5.21.1",
+    "prisma": "^7.8.0",
     "rimraf": "^6.0.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.6.3"
+    "tsx": "^4.22.4",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
-    "@prisma/client": "^5.21.1",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
     "@types/express": "^5.0.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.21.1",
-    "jsonwebtoken": "^9.0.2"
-  }
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.22.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yoldis/e-commerce-back-end.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Yoldis/e-commerce-back-end/issues"
+  },
+  "homepage": "https://github.com/Yoldis/e-commerce-back-end#readme"
 }

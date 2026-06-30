@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import { OrderService } from '../services/order.service';
 import { CreateOrderDto } from '../../domain';
 import { handleError } from '../helpers';
@@ -35,7 +35,7 @@ export class OrderController {
             return;
         }
 
-        this.orderService.getOrdersByUser(userId)
+        this.orderService.getOrdersByUser(+userId)
         .then(data => res.status(201).json(data))
         .catch(error => handleError(error, res))
     }
@@ -48,7 +48,7 @@ export class OrderController {
             return;
         }
 
-        this.orderService.getOrdersByAdmin(userId)
+        this.orderService.getOrdersByAdmin(+userId)
         .then(data => res.status(201).json(data))
         .catch(error => handleError(error, res))
     }

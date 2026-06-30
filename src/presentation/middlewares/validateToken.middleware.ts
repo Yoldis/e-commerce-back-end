@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { JwtAdapter } from "../../config";
 import { prisma } from "../../db/prismaClient";
 

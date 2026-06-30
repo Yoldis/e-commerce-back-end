@@ -2,8 +2,6 @@ import { prisma } from "../../db/prismaClient";
 import { ProductsEntity } from '../../domain/entities/products.entity';
 
 
-
-
 export class ProductsService {
 
 
@@ -19,7 +17,7 @@ export class ProductsService {
                             id:true, name:true
                         }
                     },
-                    image:{
+                    images:{
                         select:{
                             id:true, url:true
                         }
@@ -34,6 +32,8 @@ export class ProductsService {
             }
 
         } catch (error) {
+            console.log(error);
+            
             throw error;
         }
     }
@@ -51,7 +51,7 @@ export class ProductsService {
                             id:true, name:true
                         }
                     },
-                    image:{
+                    images:{
                         select:{
                             id:true, url:true
                         }

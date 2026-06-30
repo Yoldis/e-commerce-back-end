@@ -1,61 +1,87 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
-enum Role {
-  Admin
-  User
+enum Sizes {
+  Small
+  Medium
+  Large
+  X_Large
+}
+
+model Role {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  users User[]
 }
 
 model User {
-  id       String  @id @default(uuid())
-  name     String
-  email    String  @unique
-  password String
-  role     Role    @default(User)
-  Order    Order[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  roleId    Int
+  role      Role     @relation(fields: [roleId], references: [id])
+  createdAt DateTime @default(now())
+  Order     Order[]
+
+  shoopingCarts ShoopingCart[]
+}
+
+model Image {
+  id        Int     @id @default(autoincrement())
+  url       String
+  productId Int
+  products  Product @relation(fields: [productId], references: [id])
 }
 
 model Category {
-  id      String    @id @default(uuid())
+  id      Int       @id @default(autoincrement())
   name    String
   product Product[]
 }
 
-model Image {
-  id        String  @id @default(uuid())
-  url       String
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-}
-
 model Product {
-  id          String   @id @default(uuid())
+  id          Int      @id @default(autoincrement())
   name        String
   description String
   price       Float
   inStock     Int
-  sizes       String[]
+  sizes       Sizes[]
   category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  String
-  image       Image[]
+  categoryId  Int
+  images      Image[]
+  createdAt   DateTime @default(now())
+  isNew       Boolean  @default(false)
+}
+
+model ShoopingCart {
+  id       Int    @id @default(autoincrement())
+  product  String
+  image    String
+  size     Sizes
+  price    Float
+  unit     Int
+  subTotal Float
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 }
 
 model Order {
-  id           String         @id @default(uuid())
+  id           Int            @id @default(autoincrement())
   user         User           @relation(fields: [userId], references: [id])
-  userId       String
+  userId       Int
   total        Float
   unitTotal    Int
   createdAt    DateTime       @default(now())
@@ -64,7 +90,7 @@ model Order {
 }
 
 model OrderDetails {
-  id       String @id @default(uuid())
+  id       Int    @id @default(autoincrement())
   product  String
   image    String
   price    Float
@@ -72,5 +98,5 @@ model OrderDetails {
   subTotal Float
   size     String
   order    Order  @relation(fields: [orderId], references: [id])
-  orderId  String
+  orderId  Int
 }

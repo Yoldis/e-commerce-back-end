@@ -1,8 +1,5 @@
 import { Server } from "./presentation/server";
 
-
-
-
 (() => {
     main();
 })();

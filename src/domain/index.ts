@@ -1,6 +1,6 @@
 
 
-export * from './errors/customError.error';
+export * from './responseData/customResponseData';
 
 export * from './dto/registerUser.dto';
 export * from './dto/loginUser.dto';

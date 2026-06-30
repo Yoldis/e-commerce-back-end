@@ -1,7 +1,7 @@
 
 
 interface ProducInCart {
-    id:string,
+    id:number,
     product:string,
     image:string,
     size:string,
@@ -13,14 +13,14 @@ interface ProducInCart {
 export class CreateOrderDto {
 
     private constructor(
-        public readonly userId:string,
+        public readonly userId:number,
         public readonly isPaid:boolean,
         public readonly orderDetails:ProducInCart[],
-        public readonly id?:string,
+        public readonly id?:number,
     ){}
 
 
-    static createDto(object:{[key:string]:any}):[string?, CreateOrderDto?] {
+    static createDto(object:{[key:string]:any}):[string | undefined, CreateOrderDto?] {
 
         const{userId, isPaid, orderDetails, id} = object;
         if(!userId) return ['El usuario es requerido'];

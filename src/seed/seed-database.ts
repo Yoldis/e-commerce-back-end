@@ -1,7 +1,5 @@
 import { prisma } from "../db/prismaClient";
-import { imagesSeed, seedCategory, seedProductMen, seedProductsKids, seedProductsWomen, users } from "./seed";
-
-
+import { imagesSeed, categoriesSeed, productMenSeed, productsKidsSeed, productsWomenSeed, usersSeed, roleSeed } from "./seed";
 
 (async() => {
 
@@ -9,14 +7,16 @@ import { imagesSeed, seedCategory, seedProductMen, seedProductsKids, seedProduct
         // 1. Eliminamos todos los datos
         await prisma.orderDetails.deleteMany();
         await prisma.order.deleteMany();
+        await prisma.shoopingCart.deleteMany();
         await prisma.image.deleteMany();
         await prisma.product.deleteMany();
         await prisma.category.deleteMany();
         await prisma.user.deleteMany();
+        await prisma.role.deleteMany();
 
         // 2. Crear la categorias
         await prisma.category.createMany({
-            data:seedCategory.map(c => ({
+            data:categoriesSeed.map(c => ({
                 name:c.name
             }))
         });
@@ -29,16 +29,16 @@ import { imagesSeed, seedCategory, seedProductMen, seedProductsKids, seedProduct
         ]);
 
         // 4. Le asignamos la categoria a cada producto
-        const productMen = seedProductMen.map((p) => {
-            return {...p, categoryId:categoryMenDb?.id ?? ''}
+        const productMen = productMenSeed.map((p) => {
+            return {...p, categoryId:categoryMenDb?.id ?? 0}
         })
 
-        const productWomen = seedProductsWomen.map((p) => {
-            return {...p, categoryId:categoryWomenDb?.id ?? ''}
+        const productWomen = productsWomenSeed.map((p) => {
+            return {...p, categoryId:categoryWomenDb?.id ?? 0}
         })
 
-        const productKids = seedProductsKids.map((p) => {
-            return {...p, categoryId:categoryKidsDb?.id ?? ''}
+        const productKids = productsKidsSeed.map((p) => {
+            return {...p, categoryId:categoryKidsDb?.id ?? 0}
         })
 
         // 5. Creamos los productos
@@ -65,30 +65,37 @@ import { imagesSeed, seedCategory, seedProductMen, seedProductsKids, seedProduct
             prisma.image.createMany({
                 data:productsDbMen.map((p, i)=> ({
                     productId:p.id,
-                    url:imagesSeed.men[i] ?? ''
+                    url:imagesSeed.men[i]?.url ?? ''
                 }))
             }),
             prisma.image.createMany({
                 data:productsDbWomen.map((p, i)=> ({
                     productId:p.id,
-                    url:imagesSeed.women[i] ?? ''
+                    url:imagesSeed.women[i]?.url ?? ''
                 }))
             }),
             prisma.image.createMany({
                 data:productsDbKids.map((p, i)=> ({
                     productId:p.id,
-                    url:imagesSeed.kids[i] ?? ''
+                    url:imagesSeed.kids[i]?.url ?? ''
                 }))
             })
         ])
 
-        // 8. Creamos los usuarios
+        // 8. Crear los roles
+        await prisma.role.createMany({
+            data:roleSeed.map(c => ({
+                name:c.name
+            }))
+        });
+
+        // 9. Creamos los usuarios
         await prisma.user.createMany({
-            data:users.map(user => ({
+            data:usersSeed.map(user => ({
                 email:user.email,
                 name:user.name,
                 password:user.password,
-                role:user.role,
+                roleId:user.roleId,
             }))
         })
         console.log("Seed ejecutado correctamente.");

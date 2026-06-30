@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 
 interface Payload {
-    id:string
+    id:number
 }
 
 const SECRET_TOKEN = process.env.SECRET_TOKEN ?? '123123';
