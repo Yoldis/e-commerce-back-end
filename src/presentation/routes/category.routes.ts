@@ -20,7 +20,7 @@ export class CategoryRoutes {
         router.put('/:id', [validateTokenMiddleware.validate], categoryController.updateCategory);
         router.delete('/:id', [validateTokenMiddleware.validate], categoryController.deleteCategory);
         router.get('/', [validateTokenMiddleware.validate], categoryController.getCategories);
-        router.get('/company/:id', [validateTokenMiddleware.validate], categoryController.getCategoriesByCompanyId);
+        router.get('/company/:id', categoryController.getCategoriesByCompanyId);
 
         return router;
     }

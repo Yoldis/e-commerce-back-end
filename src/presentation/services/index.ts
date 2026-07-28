@@ -6,3 +6,4 @@ export * from './order.service';
 export * from './message.api.service';
 export * from './category.service';
 export * from './cloudinary.service';
+export * from './cart.service';
