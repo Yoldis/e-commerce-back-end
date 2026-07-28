@@ -1,15 +1,19 @@
 import type { Request, Response, NextFunction } from "express";
 import { JwtAdapter } from "../../config";
 import { prisma } from "../../db/prismaClient";
+import { MessageApiService } from '../services/message.api.service';
 
 
 export class ValidateTokenMiddleware {
 
-    static async validate(req:Request, res:Response, next:NextFunction){
-        const token = req.header('x-token');
+    constructor(
+        private readonly messageApiService:MessageApiService
+    ){}
 
+    public validate = async (req:Request, res:Response, next:NextFunction) => {
+        const token = req.header('x-token');
         if(!token) {
-            res.status(401).json({error:"No hay token en la peticion"})
+            this.messageApiService.unAuthorized("No hay token en la peticion", null, res);
             return;
         }
         
@@ -17,7 +21,7 @@ export class ValidateTokenMiddleware {
             const data = await JwtAdapter.decodeToken(token);
             
             if(!data) {
-                res.status(401).json({error:"El token no es valido"})
+                this.messageApiService.unAuthorized("El token no es valido", null, res);
                 return;
             }
 
@@ -26,14 +30,14 @@ export class ValidateTokenMiddleware {
             });
 
             if(!user) {
-                res.status(401).json({error:"El usuario no existe"})
+                this.messageApiService.unAuthorized("El usuario no existe", null, res);
                 return;
             }
 
             next();
 
         } catch (error) {
-            throw error
+            throw error;
         }
     }
 }

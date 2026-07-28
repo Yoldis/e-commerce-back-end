@@ -1,21 +1,15 @@
 import { BcryptAdapter } from "../config";
-import type { CategoryModel, ImageModel, ProductModel, RoleModel, UserModel } from "../../generated/prisma/models";
-import type { Sizes } from "../../generated/prisma/enums";
+import type { CategoryModel, ProductModel, UserModel } from "../../generated/prisma/models";
+import type { Roles, Sizes } from "../../generated/prisma/enums";
 
-interface imageProductSeed {
-  men:ImageModel[],
-  women:ImageModel[],
-  kids:ImageModel[],
-}
-
-export const roleSeed:RoleModel[]  = [
+export const roleSeed:{id:number, name:Roles}[]  = [
     {id:1, name:'Admin'},
     {id:2, name:'User'},
 ]
 
 export const usersSeed:UserModel[] = [
-    {name:'Administrador', email:'administrador@gmail.com', password:BcryptAdapter.generateHash('123123'), roleId:1, id:1, createdAt:new Date()},
-    {name:'Usuario', email:'usuario@gmail.com', password:BcryptAdapter.generateHash('123123'), roleId:2, id:2, createdAt:new Date()},
+    {name:'Administrador', email:'administrador@gmail.com', password:BcryptAdapter.generateHash('123123'), roleId:1, id:1, createdAt:new Date(), avatar:null},
+    {name:'Usuario', email:'usuario@gmail.com', password:BcryptAdapter.generateHash('123123'), roleId:2, id:2, createdAt:new Date(), avatar:null},
 ];
 
 export const categoriesSeed:CategoryModel[]  = [
@@ -36,7 +30,7 @@ function getRandomSizes() {
   return selectedSizes;
 }
  
-export const productMenSeed:ProductModel[] = [
+export const productMenSeed:any[] = [
   {
     name: 'Camisa en algodón pima Slim Fit',
     description: 'Camisa en algodón pima con un ajuste Slim Fit ideal para cualquier ocasión.',
@@ -94,7 +88,7 @@ export const productMenSeed:ProductModel[] = [
   },
 ];
 
-export const productsWomenSeed:ProductModel[] = [
+export const productsWomenSeed:any[] = [
   {
     name: 'Americana con cinturón de anudar',
     description: 'Americana elegante con cinturón de anudar, perfecta para un look sofisticado.',
@@ -152,7 +146,7 @@ export const productsWomenSeed:ProductModel[] = [
   },
 ];
 
-export const productsKidsSeed:ProductModel[] = [
+export const productsKidsSeed:any[] = [
   {
     name: 'Sudadera',
     description: 'Sudadera para niños con un diseño cómodo y moderno.',
@@ -210,7 +204,7 @@ export const productsKidsSeed:ProductModel[] = [
   },
 ];
 
-export const imagesSeed:imageProductSeed = {
+export const imagesSeed:any = {
     men:[
       {id:0, productId:0, url:'https://res.cloudinary.com/dljqyy9l7/image/upload/v1729863296/E-Commerce/men/u5q7aimzmrblahtqqluy.avif'},
       {id:0, productId:0, url:'https://res.cloudinary.com/dljqyy9l7/image/upload/v1729863295/E-Commerce/men/jczpdtlfp2l9x8e9zsw8.avif'},

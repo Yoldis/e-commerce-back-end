@@ -1,0 +1,32 @@
+info:
+  name: Update Company
+  type: http
+  seq: 6
+
+http:
+  method: PUT
+  url: http://localhost:3001/api/company/1
+  headers:
+    - name: x-token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzg0NDk3MDI3LCJleHAiOjE3ODQ1MDQyMjd9.QMOb8vC6ARsEqh19tFBTVBt7a4D7jSCj4HqkyRnk3Cw
+  body:
+    type: json
+    data: |-
+      {
+        "id":1,
+        "tradeName": "Mi Empresa",
+        "businessName": "Mi Empresa SRL",
+        "phone": "+18095551234",
+        "email": "contacto@miempresa.com",
+        "address": "Av. Independencia #123, Santo Domingo",
+        "currency": "DOP",
+        "logo": "https://miempresa.com/logo.png",
+        "userId": 1
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

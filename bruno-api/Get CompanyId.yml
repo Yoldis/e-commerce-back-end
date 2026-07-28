@@ -1,0 +1,18 @@
+info:
+  name: Get CompanyId
+  type: http
+  seq: 8
+
+http:
+  method: GET
+  url: http://localhost:3001/api/company/1
+  headers:
+    - name: x-token
+      value: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNzg0NTA0NTUwLCJleHAiOjE3ODQ1MTE3NTB9.Z646OcFA8VLt6w-1puJDX1pWVsSAOn1baOmtyIWxYhU
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

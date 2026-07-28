@@ -12,6 +12,14 @@ datasource db {
   provider = "postgresql"
 }
 
+// DB
+
+enum Roles {
+  Admin
+  User
+  Company
+}
+
 enum Sizes {
   Small
   Medium
@@ -19,9 +27,26 @@ enum Sizes {
   X_Large
 }
 
+model Company {
+  id           Int    @id @default(autoincrement())
+  tradeName    String @unique
+  businessName String @unique
+  phone        String @unique
+  email        String @unique
+  address      String
+  currency     String
+  logo         String
+
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+
+  products Product[]
+  categories Category[]
+}
+
 model Role {
   id    Int    @id @default(autoincrement())
-  name  String @unique
+  name  Roles  @unique
   users User[]
 }
 
@@ -33,22 +58,37 @@ model User {
   roleId    Int
   role      Role     @relation(fields: [roleId], references: [id])
   createdAt DateTime @default(now())
-  Order     Order[]
+  avatar    String?
 
+  order         Order[]
   shoopingCarts ShoopingCart[]
+  company       Company?
 }
 
-model Image {
+model ProductImages {
   id        Int     @id @default(autoincrement())
   url       String
   productId Int
-  products  Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Category {
-  id      Int       @id @default(autoincrement())
-  name    String
-  product Product[]
+  id          Int    @id @default(autoincrement())
+  name        String
+  description String
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+  productCategories ProductCategories[]
+}
+
+model ProductCategories {
+  id         Int      @id @default(autoincrement())
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
 model Product {
@@ -58,11 +98,13 @@ model Product {
   price       Float
   inStock     Int
   sizes       Sizes[]
-  category    Category @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  images      Image[]
   createdAt   DateTime @default(now())
-  isNew       Boolean  @default(false)
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
+
+  productImages     ProductImages[]
+  productCategories ProductCategories[]
 }
 
 model ShoopingCart {

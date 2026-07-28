@@ -1,19 +1,23 @@
 import { prisma } from "../../db/prismaClient";
-import { CreateOrderDto, CustomResponseData } from "../../domain";
+import { CreateOrderDto } from "../../domain";
 import { OrderEntity } from '../../domain/entities/order.entity';
+import type { MessageApiService } from "./message.api.service";
 
 
 
 
 export class OrderService {
 
+    constructor(
+        private readonly messageApiService:MessageApiService
+    ){}
 
     public async createOrder(dataDto:CreateOrderDto) {
 
         try {
             if(dataDto.id) {
                 const existOrder = await prisma.order.findUnique({where:{id:dataDto.id}});
-                if(!existOrder) throw CustomResponseData.badRequest('La orden no existe');
+                if(!existOrder) throw this.messageApiService.badRequest('La orden no existe');
 
                 await prisma.order.update({
                     where:{id:dataDto.id},
@@ -121,47 +125,10 @@ export class OrderService {
 
         try {
             const user = await prisma.user.findUnique({where:{id:userId}});
-            if(!user) throw CustomResponseData.badRequest("El usuario no existe");
+            if(!user) throw this.messageApiService.badRequest("El usuario no existe");
 
             const orders = await prisma.order.findMany({
                 where:{userId},
-                select:{
-                    id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
-                    user:{
-                        select:{
-                            id:true, email:true, name:true, role:true
-                        }
-                    },
-
-                    orderDetails:{
-                        select:{
-                            id:true, subTotal:true, unit:true, image:true, price: true, 
-                            product:true, size:true
-                        }
-                    }
-                }
-            })
-
-            const orderEntity = orders.map(order => OrderEntity.objectOrder(order)) 
-
-            return {
-                orders:orderEntity
-            }
-
-        } catch (error) {
-            throw error;
-        }
-    }
-
-
-    public async getOrdersByAdmin(userId:number) {
-
-        try {
-            const user = await prisma.user.findUnique({where:{id:userId}, include:{role:true}});
-            if(!user) throw CustomResponseData.badRequest("El usuario no existe");
-            if(user.role.nombre !== 'Admin') throw CustomResponseData.badRequest("El usuario no tiene permisos");
-
-            const orders = await prisma.order.findMany({
                 select:{
                     id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
                     user:{
