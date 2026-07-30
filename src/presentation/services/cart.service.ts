@@ -14,7 +14,7 @@ export class CartService {
             const user = await manager.user.findUnique({where:{id:userId}});
             if(!user) throw this.messageApiService.badRequest("El usuario no existe");
 
-            for (const item of createCartDto.createCartItemDto) {
+            for (const item of createCartDto.items) {
                 const product = await manager.product.findUnique({where:{id:item.productId}, include:{productImages:true}});
                 if(!product) continue;
                 if(!product.inStock) continue;

@@ -5,17 +5,19 @@ import type { Sizes } from "../../../generated/prisma/enums";
 export class CreateCartDto {
 
     private constructor(
-        public readonly createCartItemDto:CreateCartItemDto[],
+        public readonly userId:number,
+        public readonly items:CreateCartItemDto[],
     ){}
 
 
     static dto (object:{[key:string]:any}): [string | undefined, CreateCartDto | undefined] {
 
-        const{createCartItemDto} = object;
+        const{userId, items} = object;
 
-        if(!createCartItemDto) return ['Los items son requeridos', undefined];
+        if(!userId) return ['El usuario es requeridos', undefined];
+        if(!items) return ['Los items son requeridos', undefined];
 
-        return [undefined, new CreateCartDto(createCartItemDto)];
+        return [undefined, new CreateCartDto(+userId, items)];
     }
 
 }
