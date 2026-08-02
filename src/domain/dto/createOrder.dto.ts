@@ -1,22 +1,11 @@
-
-
-interface ProducInCart {
-    id:number,
-    product:string,
-    image:string,
-    size:string,
-    price:number,
-    unit:number,
-    subTotal:number,
-}
-
+import type { CartEntity } from "../entities/cart.entity";
 export class CreateOrderDto {
 
     private constructor(
         public readonly userId:number,
         public readonly isPaid:boolean,
-        public readonly orderDetails:ProducInCart[],
-        public readonly id?:number,
+        public readonly orderDetails:CartEntity[],
+        public id?:number,
     ){}
 
 

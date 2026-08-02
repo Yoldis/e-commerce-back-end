@@ -21,11 +21,11 @@ export class CartService {
                 if(product.inStock < item.unit) continue;
                 if((product.inStock - item.unit) < 0) continue;
 
-                const productInCart = await manager.shoopingCart.findFirst({where:{userId:item.userId, productId:item.productId}});
+                const productInCart = await manager.shoopingCart.findFirst({where:{userId, productId:item.productId, size:item.size}});
                 // Actualizar
                 if(productInCart) {
                     const subTotal = product.price * item.unit;
-                    await prisma.shoopingCart.update({
+                    await manager.shoopingCart.update({
                         where:{id:productInCart.id},
                         data:{
                             unit:productInCart.unit + item.unit,
@@ -35,7 +35,6 @@ export class CartService {
                     });
                     continue;
                 }
-                
                 // Creamos
                 await manager.shoopingCart.create({
                     data:{
@@ -46,7 +45,7 @@ export class CartService {
                         subTotal:product.price * item.unit,
                         unit:item.unit,
                         productId:product.id,
-                        userId:user.id
+                        userId:user.id,
                     }
                 });
             }
@@ -55,12 +54,12 @@ export class CartService {
         });
     }
 
-    public addShoopingCart = async(createCartDto:CreateCartItemDto) => {
+    public addItemShoopingCart = async(createCartDto:CreateCartItemDto) => {
         
         const[user, product, productInCart] = await Promise.all([
             prisma.user.findUnique({where:{id:createCartDto.userId}}),
             prisma.product.findUnique({where:{id:createCartDto.productId}, include:{productImages:true}}),
-            prisma.shoopingCart.findFirst({where:{userId:createCartDto.userId, productId:createCartDto.productId}}),
+            prisma.shoopingCart.findFirst({where:{userId:createCartDto.userId, productId:createCartDto.productId, size:createCartDto.size}}),
         ]);
 
         if(!user) throw this.messageApiService.badRequest("El usuario no existe");
@@ -101,11 +100,11 @@ export class CartService {
         return shoopingCartUpdate;
     }
 
-    public removeShoopingCart = async(createCartDto:CreateCartItemDto) => {
+    public removeItemShoopingCart = async(createCartDto:CreateCartItemDto) => {
         const[user, product, productInCart] = await Promise.all([
             prisma.user.findUnique({where:{id:createCartDto.userId}}),
             prisma.product.findUnique({where:{id:createCartDto.productId}}),
-            prisma.shoopingCart.findFirst({where:{userId:createCartDto.userId, productId:createCartDto.productId}}),
+            prisma.shoopingCart.findFirst({where:{userId:createCartDto.userId, productId:createCartDto.productId, size:createCartDto.size}}),
         ]);
 
         if(!user) throw this.messageApiService.badRequest("El usuario no existe");
@@ -128,11 +127,19 @@ export class CartService {
         return shoopingCartUpdate;
     }
 
-    public removeAllShoopingCartByUserId = async(userId:number) => {
+    public clearShoopingCartByUserId = async(userId:number) => {
         const user = await prisma.user.findUnique({where:{id:userId}});
         if(!user) throw this.messageApiService.badRequest("El usuario no existe", null);
 
         await prisma.shoopingCart.deleteMany({where:{userId}});
+        return true;
+    }
+
+    public removeAllByProductIdAndUserId = async(userId:number, productId:number) => {
+        const user = await prisma.user.findUnique({where:{id:userId}});
+        if(!user) throw this.messageApiService.badRequest("El usuario no existe", null);
+
+        await prisma.shoopingCart.deleteMany({where:{userId, productId}});
         return true;
     }
 

@@ -1,7 +1,7 @@
 import type { UploadedFile } from "express-fileupload";
 import { prisma } from "../../db/prismaClient";
 import type { CreateProductDto } from "../../domain/dto/createProduct.dto";
-import { ProductsEntity } from '../../domain/entities/products.entity';
+import { ProductEntity } from '../../domain/entities/product.entity';
 import type { CloudinaryService } from "./cloudinary.service";
 import type { MessageApiService } from "./message.api.service";
 
@@ -58,7 +58,7 @@ export class ProductsService {
 
             if(!productFind) throw this.messageApiService.badRequest("El producto no existe", null);
 
-            return ProductsEntity.objectProducts(productFind);
+            return ProductEntity.objectProducts(productFind);
         });
     }
 
@@ -106,7 +106,7 @@ export class ProductsService {
             }
         });
         
-        const productsEntity = products.map(p => ProductsEntity.objectProducts(p));
+        const productsEntity = products.map(p => ProductEntity.objectProducts(p));
         return productsEntity
     }
 
@@ -122,20 +122,22 @@ export class ProductsService {
             }
         });
         
-        const productsEntity = products.map(p => ProductsEntity.objectProducts(p));
+        const productsEntity = products.map(p => ProductEntity.objectProducts(p));
         return productsEntity
     }
 
     public searchProducts = async(search:string) => {
         const products = await prisma.product.findMany({
-            where:{name:{startsWith:search, mode:'insensitive'}},
-            select:{
-                id:true, name:true, description:true, price:true,
-                inStock:true, sizes:true,
-            },
+            where:{name:{contains:search, mode:'insensitive'}},
+            include:{
+                productCategories:{
+                    include:{category:true}
+                }, 
+                productImages:true
+            }
         });
         
-        const productsEntity = products.map(p => ProductsEntity.objectProducts(p));
+        const productsEntity = products.map(p => ProductEntity.objectProducts(p));
 
         return productsEntity;
     }

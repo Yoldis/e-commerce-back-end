@@ -1,4 +1,3 @@
-import { MessageApiService } from "../../presentation/services/message.api.service";
 import { OrderDetailsEntity } from "./orderDetails.entity";
 import { UserEntity } from "./user.entity";
 
@@ -22,12 +21,12 @@ export class OrderEntity {
         const{id, userId, isPaid, createdAt, total, unitTotal, user, orderDetails} = object;
 
         // Se puede hacer validaciones
-        if(!user.id) throw MessageApiService.badRequest('El usuario no existe');
-        if(!Array.isArray(orderDetails)) throw MessageApiService.badRequest('Los detalles deben ser un arreglo');
+        // if(!user.id) throw MessageApiService.badRequest('El usuario no existe');
+        // if(!Array.isArray(orderDetails)) throw MessageApiService.badRequest('Los detalles deben ser un arreglo');
 
-        const orderDetailsEntity = orderDetails.map(order => OrderDetailsEntity.objectDetails(order))
-        const userEntity = UserEntity.objectUser(user);
+        // const orderDetailsEntity = orderDetails.map(order => OrderDetailsEntity.objectDetails(order))
+        // const userEntity = UserEntity.objectUser(user);
 
-        return new OrderEntity(id, userId, isPaid, createdAt, total, unitTotal, userEntity, orderDetailsEntity);
+        return new OrderEntity(id, userId, isPaid, createdAt, total, unitTotal, user, orderDetails);
     }
 }

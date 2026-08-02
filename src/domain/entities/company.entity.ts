@@ -1,4 +1,4 @@
-import type { ProductsEntity } from "./products.entity";
+import type { ProductEntity } from "./product.entity";
 import type { UserEntity } from "./user.entity";
 
 export class CompanyEntity {
@@ -13,7 +13,7 @@ export class CompanyEntity {
     public readonly logo: string,
     public readonly userId: number,
     public readonly user?: UserEntity,
-    public readonly products?: ProductsEntity[],
+    public readonly products?: ProductEntity[],
   ) {}
 
   static create(props: CompanyEntity): CompanyEntity {

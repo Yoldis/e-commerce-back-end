@@ -4,7 +4,8 @@
 export class OrderDetailsEntity {
 
     private constructor(
-        public readonly id:string,
+        public readonly id:number,
+        public readonly orderId:number,
         public readonly product:string,
         public readonly image:string,
         public readonly price:number,
@@ -16,10 +17,10 @@ export class OrderDetailsEntity {
 
     static objectDetails(object:{[key:string]:any}):OrderDetailsEntity {
 
-        const{id, product, image, price, size, subTotal, unit} = object
+        const{id, orderId, product, image, price, size, subTotal, unit} = object
 
         // Se puede aplicar comprobaciones para verificar si estos valores de verdad existen
 
-        return new OrderDetailsEntity(id, product, image, price, size, subTotal, unit);
+        return new OrderDetailsEntity(+id, +orderId,product, image, price, size, subTotal, unit);
     }
 }

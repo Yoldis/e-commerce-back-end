@@ -1,7 +1,7 @@
 
 
 
-export class ProductsEntity {
+export class ProductEntity {
 
     private constructor(
         public readonly id:string,
@@ -15,11 +15,11 @@ export class ProductsEntity {
     ){}
 
 
-    static objectProducts = (object:{[key:string]:any}):ProductsEntity => {
+    static objectProducts = (object:{[key:string]:any}):ProductEntity => {
 
 
         const {id, name, description, price, inStock, sizes, productCategories, productImages} = object;
 
-        return new ProductsEntity(id,name, description, price, inStock, sizes, productCategories, productImages);
+        return new ProductEntity(id,name, description, price, inStock, sizes, productCategories, productImages);
     }
 }

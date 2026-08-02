@@ -30,38 +30,56 @@ export class CartController {
         .catch(error => this.messageApiService.handleError(error, res));
     }
 
-    public addShoopingCart = (req:Request, res:Response) => {
+    public addItemShoopingCart = (req:Request, res:Response) => {
         const [error, payload] = CreateCartItemDto.dto(req.body);
         if(error) {
             this.messageApiService.badRequest(error, null, res);
             return;
         }
 
-        this.cartService.addShoopingCart(payload!)
+        this.cartService.addItemShoopingCart(payload!)
         .then(data => this.messageApiService.ok("Producto agregado al carrito", data, res))
         .catch(error => this.messageApiService.handleError(error, res));
     }
 
-    public removeShoopingCart = (req:Request, res:Response) => {
+    public removeItemShoopingCart = (req:Request, res:Response) => {
         const [error, payload] = CreateCartItemDto.dto(req.body);
         if(error) {
             this.messageApiService.badRequest(error, null, res);
             return;
         }
 
-        this.cartService.removeShoopingCart(payload!)
+        this.cartService.removeItemShoopingCart(payload!)
         .then(data => this.messageApiService.ok("Producto removido del carrito", data, res))
         .catch(error => this.messageApiService.handleError(error, res));
-    }
+    } 
 
-    public removeAllShoopingCartByUserId = (req:Request, res:Response) => {
-        const userId = req.params['id'];
+    public removeAllByProductIdAndUserId = (req:Request, res:Response) => {
+        const userId = req.params['userId'];
+        const productId = req.params['productId'];
         if(userId && isNaN(+userId)) {
             this.messageApiService.badRequest("El usuario no es valido", userId, res);
             return;
         }
 
-        this.cartService.removeAllShoopingCartByUserId(+userId!)
+        if(productId && isNaN(+productId)) {
+            this.messageApiService.badRequest("El producto no es valido", userId, res);
+            return;
+        }
+
+        this.cartService.removeAllByProductIdAndUserId(+userId!, +productId!)
+        .then(data => this.messageApiService.ok("Carrito vacio", data, res))
+        .catch(error => this.messageApiService.handleError(error, res));
+    }
+
+    public clearShoopingCartByUserId = (req:Request, res:Response) => {
+        const userId = req.params['userId'];
+        if(userId && isNaN(+userId)) {
+            this.messageApiService.badRequest("El usuario no es valido", userId, res);
+            return;
+        }
+
+        this.cartService.clearShoopingCartByUserId(+userId!)
         .then(data => this.messageApiService.ok("Carrito vacio", data, res))
         .catch(error => this.messageApiService.handleError(error, res));
     }

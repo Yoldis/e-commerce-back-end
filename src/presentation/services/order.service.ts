@@ -12,47 +12,44 @@ export class OrderService {
         private readonly messageApiService:MessageApiService
     ){}
 
-    public async createOrder(dataDto:CreateOrderDto) {
-
-        try {
-            if(dataDto.id) {
-                const existOrder = await prisma.order.findUnique({where:{id:dataDto.id}});
+    public createOrder = async(dataDto:CreateOrderDto) => {
+        return prisma.$transaction(async(manager) => {
+            // Si existe la orden la actualizamo a pagada, porque estaba guardada
+             if(dataDto.id) {
+                const existOrder = await manager.order.findUnique({where:{id:dataDto.id}});
                 if(!existOrder) throw this.messageApiService.badRequest('La orden no existe');
 
-                await prisma.order.update({
-                    where:{id:dataDto.id},
-                    data:{isPaid:true}
-                })
+                // Buscamos la ordenDetalle
+                const orderDetails = await manager.orderDetails.findMany({where:{orderId:dataDto.id}});
+                for (const detail of orderDetails) {
+                    // Verificar si el producto tiene stock
+                    const product = await manager.product.findUnique({where:{id:detail.productId}});
+                    if(!product) throw this.messageApiService.badRequest("El producto no existe", null);
+                    if(!product.inStock) throw this.messageApiService.badRequest("El producto no tiene stock disponible");
+                    if(product.inStock < detail.unit) throw this.messageApiService.badRequest("La cantidad es mayor que el stock del producto");
+                    if((product.inStock - detail.unit) < 0) throw this.messageApiService.badRequest("El producto no tiene suficiente stock disponible");
 
-                const order = await prisma.order.findUnique({
-                    where:{id:dataDto.id},
-                    select:{
-                        id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
-                        user:{
-                            select:{
-                                id:true, email:true, name:true, role:true
-                            }
-                        },
-                        orderDetails:{
-                            select:{
-                                id:true, subTotal:true, unit:true, image:true, price: true, 
-                                product:true, size:true
+                    // Bajamos el stock del producto si este esta pagado
+                    await manager.product.update({
+                        where:{id:product.id},
+                        data:{
+                            inStock:{
+                                decrement:detail.unit
                             }
                         }
-                    }
-                })
-
-                return {
-                    order
+                    });
                 }
+
+                await manager.order.update({
+                    where:{id:dataDto.id},
+                    data:{isPaid:true}
+                });
             }
-
-            const total = dataDto.orderDetails.reduce((acc, item) => (acc + item.subTotal), 0)
-            const unitTotal = dataDto.orderDetails.reduce((acc, item) => (acc + item.unit), 0)
-
-            const data = await prisma.$transaction(async(tx) => {
-
-                const createOrder = await tx.order.create({
+            else {
+                const total = dataDto.orderDetails.reduce((acc, item) => (acc + item.subTotal), 0)
+                const unitTotal = dataDto.orderDetails.reduce((acc, item) => (acc + item.unit), 0)
+        
+                const createOrder = await manager.order.create({
                     data:{
                         userId:dataDto.userId,
                         isPaid:dataDto.isPaid,
@@ -61,99 +58,66 @@ export class OrderService {
                     }
                 });
 
-                await tx.orderDetails.createMany({
-                    data:dataDto.orderDetails.map(p => ({
-                        orderId:createOrder.id,
-                        price:p.price,
-                        product:p.product,
-                        size:p.size,
-                        subTotal:p.subTotal,
-                        unit:p.unit,
-                        image:p.image,
-                    }))
-                });
+                dataDto.id = createOrder.id;
 
-                const productsPromise = dataDto.orderDetails.map(async(p) => {
-                    await tx.product.update({
-                        where:{id:p.id},
+                for (const detail of dataDto.orderDetails) {
+                    // Verificar si el producto tiene stock
+                    const product = await manager.product.findUnique({where:{id:detail.productId}});
+                    if(!product) throw this.messageApiService.badRequest("El producto no existe", null);
+                    if(!product.inStock) throw this.messageApiService.badRequest("El producto no tiene stock disponible");
+                    if(product.inStock < detail.unit) throw this.messageApiService.badRequest("La cantidad es mayor que el stock del producto");
+                    if((product.inStock - detail.unit) < 0) throw this.messageApiService.badRequest("El producto no tiene suficiente stock disponible");
+
+                    // Registramos el detalle
+                    await manager.orderDetails.create({data:{
+                        orderId:createOrder.id,
+                        price:detail.price,
+                        productName:detail.productName,
+                        productId:detail.productId,
+                        size:detail.size,
+                        subTotal:detail.subTotal,
+                        unit:detail.unit,
+                        image:detail.image,
+                    }});
+
+                    // Bajamos el stock del producto si este esta pagado
+                    if(dataDto.isPaid) await manager.product.update({
+                        where:{id:product.id},
                         data:{
                             inStock:{
-                                decrement:p.unit
+                                decrement:detail.unit
                             }
                         }
                     });
-                })
-                await Promise.all(productsPromise);
-
-                const order = await tx.order.findUnique({
-                    where:{id:createOrder.id},
-                    select:{
-                        id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
-                        user:{
-                            select:{
-                                id:true, email:true, name:true, role:true
-                            }
-                        },
-
-                        orderDetails:{
-                            select:{
-                                id:true, subTotal:true, unit:true, image:true, price: true, 
-                                product:true, size:true
-                            }
-                        }
-                    }
-                })
-                
-
-                return {
-                    order
-                }
-            })
-
-            return {
-                order:data.order
+                };
             }
 
-        } catch (error) {
-            console.log(error)
-            throw error;
-        }
-    }
-
-
-    public async getOrdersByUser(userId:number) {
-
-        try {
-            const user = await prisma.user.findUnique({where:{id:userId}});
-            if(!user) throw this.messageApiService.badRequest("El usuario no existe");
-
-            const orders = await prisma.order.findMany({
-                where:{userId},
+            // Buscamos la orden actual
+            const order = await manager.order.findUnique({
+                where:{id:dataDto.id},
                 select:{
                     id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
-                    user:{
-                        select:{
-                            id:true, email:true, name:true, role:true
-                        }
-                    },
-
-                    orderDetails:{
-                        select:{
-                            id:true, subTotal:true, unit:true, image:true, price: true, 
-                            product:true, size:true
-                        }
-                    }
+                    orderDetails:true
                 }
             })
+            
+            return order;
+        });
+    };
 
-            const orderEntity = orders.map(order => OrderEntity.objectOrder(order)) 
+    public getOrdersByUser = async(userId:number) => {
+        const user = await prisma.user.findUnique({where:{id:userId}});
+        if(!user) throw this.messageApiService.badRequest("El usuario no existe");
 
-            return {
-                orders:orderEntity
+        const orders = await prisma.order.findMany({
+            where:{userId},
+            select:{
+                id:true, isPaid:true, createdAt:true, total:true, unitTotal:true, userId:true,
+                orderDetails:true
             }
+        })
 
-        } catch (error) {
-            throw error;
-        }
+        const orderEntity = orders.map(order => OrderEntity.objectOrder(order)) 
+        return orderEntity;
     }
 }

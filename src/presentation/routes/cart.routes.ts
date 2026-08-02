@@ -16,11 +16,12 @@ export class CartRoutes {
 
         router.get("/:id", [validateTokenMiddleware.validate], cartController.getShoopingCartByUserId);
 
-        router.post("/add", [validateTokenMiddleware.validate], cartController.addShoopingCart);
+        router.post("/add", [validateTokenMiddleware.validate], cartController.addItemShoopingCart);
         router.post("/addAll/:id", [validateTokenMiddleware.validate], cartController.addAllShoopingCartByUserId);
 
-        router.post("/remove", [validateTokenMiddleware.validate], cartController.removeShoopingCart);
-        router.delete("/removeAll/:id", [validateTokenMiddleware.validate], cartController.removeAllShoopingCartByUserId);
+        router.post("/remove", [validateTokenMiddleware.validate], cartController.removeItemShoopingCart);
+        router.delete("/removeAll/:userId/:productId", [validateTokenMiddleware.validate], cartController.removeAllByProductIdAndUserId);
+        router.delete("/clear/:userId", [validateTokenMiddleware.validate], cartController.clearShoopingCartByUserId);
 
         return router;
     }

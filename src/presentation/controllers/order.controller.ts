@@ -20,7 +20,7 @@ export class OrderController {
         }
 
         this.orderService.createOrder(dataDto!)
-        .then(data => res.status(201).json(data))
+        .then(data => this.messageApiService.created("Orden creada con exito", data, res))
         .catch(error => this.messageApiService.handleError(error, res))
     }
 
@@ -35,7 +35,7 @@ export class OrderController {
         }
 
         this.orderService.getOrdersByUser(+userId)
-        .then(data => res.status(201).json(data))
+        .then(data => this.messageApiService.ok("Ordenes encontrads", data, res))
         .catch(error => this.messageApiService.handleError(error, res))
     }
 }
