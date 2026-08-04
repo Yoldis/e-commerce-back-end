@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import type { CartService, MessageApiService } from "../services";
 import { CreateCartDto, CreateCartItemDto } from "../../domain/dto/createCart.dto";
+import type { Sizes } from "../../../generated/prisma/enums";
 
 
 
@@ -57,17 +58,24 @@ export class CartController {
     public removeAllByProductIdAndUserId = (req:Request, res:Response) => {
         const userId = req.params['userId'];
         const productId = req.params['productId'];
+        const size = req.query['size'];
+
         if(userId && isNaN(+userId)) {
             this.messageApiService.badRequest("El usuario no es valido", userId, res);
             return;
         }
 
         if(productId && isNaN(+productId)) {
-            this.messageApiService.badRequest("El producto no es valido", userId, res);
+            this.messageApiService.badRequest("El producto no es valido", productId, res);
             return;
         }
 
-        this.cartService.removeAllByProductIdAndUserId(+userId!, +productId!)
+        if(!size) {
+            this.messageApiService.badRequest("El size no es valido", size, res);
+            return;
+        }
+
+        this.cartService.removeAllByProductIdAndUserId(+userId!, +productId!, size as Sizes)
         .then(data => this.messageApiService.ok("Carrito vacio", data, res))
         .catch(error => this.messageApiService.handleError(error, res));
     }

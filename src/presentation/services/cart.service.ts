@@ -1,3 +1,4 @@
+import type { Sizes } from "../../../generated/prisma/enums";
 import { prisma } from "../../db/prismaClient";
 import type { CreateCartDto, CreateCartItemDto } from "../../domain/dto/createCart.dto";
 import type { MessageApiService } from "./message.api.service";
@@ -135,11 +136,11 @@ export class CartService {
         return true;
     }
 
-    public removeAllByProductIdAndUserId = async(userId:number, productId:number) => {
+    public removeAllByProductIdAndUserId = async(userId:number, productId:number, size:Sizes) => {
         const user = await prisma.user.findUnique({where:{id:userId}});
         if(!user) throw this.messageApiService.badRequest("El usuario no existe", null);
 
-        await prisma.shoopingCart.deleteMany({where:{userId, productId}});
+        await prisma.shoopingCart.deleteMany({where:{userId, productId, size}});
         return true;
     }
 
