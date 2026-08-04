@@ -12,14 +12,15 @@ export class ProductEntity {
         public readonly sizes:string[],
         public readonly productCategories:Object[],
         public readonly productImages:Object[],
+        public readonly offers:Object[],
     ){}
 
 
     static objectProducts = (object:{[key:string]:any}):ProductEntity => {
 
 
-        const {id, name, description, price, inStock, sizes, productCategories, productImages} = object;
+        const {id, name, description, price, inStock, sizes, productCategories, productImages, offers} = object;
 
-        return new ProductEntity(id,name, description, price, inStock, sizes, productCategories, productImages);
+        return new ProductEntity(id,name, description, price, inStock, sizes, productCategories, productImages, offers);
     }
 }

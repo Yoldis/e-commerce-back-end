@@ -15,7 +15,10 @@ export class OfferRoutes {
         const offerService = new OfferService(messageApiService);
         const offerController = new OfferController(messageApiService, offerService);
 
-        router.post("/", [validateTokenMiddleware.validate]);
+        router.post("/", [validateTokenMiddleware.validate], offerController.createOffer);
+        router.put("/:id", [validateTokenMiddleware.validate], offerController.updateOffer);
+        router.delete("/:id", [validateTokenMiddleware.validate], offerController.deleteOffer);
+        router.get("/company/:id", [validateTokenMiddleware.validate], offerController.getOffersByCompanyId);
 
         return router;
     }

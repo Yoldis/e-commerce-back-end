@@ -52,7 +52,8 @@ export class ProductsService {
                     productCategories:{
                         include:{category:true}
                     }, 
-                    productImages:true
+                    productImages:true,
+                    offers:true
                 }
             });
 
@@ -81,7 +82,8 @@ export class ProductsService {
                     productCategories:{
                         include:{category:true}
                     }, 
-                    productImages:true
+                    productImages:true,
+                    offers:true
                 }
             })
         });
@@ -102,7 +104,8 @@ export class ProductsService {
                 productCategories:{
                     include:{category:true}
                 }, 
-                productImages:true
+                productImages:true,
+                offers:true
             }
         });
         
@@ -118,7 +121,8 @@ export class ProductsService {
                 productCategories:{
                     include:{category:true}
                 }, 
-                productImages:true
+                productImages:true,
+                offers:true
             }
         });
         
@@ -133,7 +137,8 @@ export class ProductsService {
                 productCategories:{
                     include:{category:true}
                 }, 
-                productImages:true
+                productImages:true,
+                offers:true
             }
         });
         

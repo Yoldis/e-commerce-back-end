@@ -42,6 +42,7 @@ model Company {
 
   products   Product[]
   categories Category[]
+  offers     Offer[]
 }
 
 model Role {
@@ -107,7 +108,7 @@ model Product {
   productCategories ProductCategories[]
   shoopingCarts     ShoopingCart[]
   orderDetails      OrderDetails[]
-  offerts           Offer[]
+  offers            Offer[]
 }
 
 model ShoopingCart {
@@ -153,17 +154,20 @@ model OrderDetails {
 }
 
 model Offer {
-  id              Int      @id @default(autoincrement())
-  productId       Int
-  product         Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  type            OffertType
-  value           Decimal  @db.Decimal(10, 2)
-  startDate       DateTime
-  endDate         DateTime
-  isActive        Boolean  @default(true)
-  description     String?  @db.VarChar(255)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id          Int        @id @default(autoincrement())
+  productId   Int
+  product     Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+  type        OffertType
+  value       Decimal    @db.Decimal(10, 2)
+  startDate   DateTime
+  endDate     DateTime
+  isActive    Boolean    @default(true)
+  description String?    @db.VarChar(255)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
 
   @@index([productId])
   @@index([startDate, endDate])
@@ -174,8 +178,6 @@ enum OffertType {
   FIXED_AMOUNT
   FIXED_PRICE
 }
-
-
 
 // PERCENTAGE: el valor es un porcentaje.
 // Precio: 1000
