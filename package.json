@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon",
     "build": "rimraf ./dist && tsc",
-    "start": "npm run build && node dist/app.js",
+    "start": "tsx src/app.ts",
     "seed": "tsx src/seed/seed-database.ts"
   },
   "keywords": [],
@@ -32,7 +32,7 @@
     "@prisma/adapter-pg": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@types/express": "^5.0.0",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cloudinary": "^2.10.0",
     "cors": "^2.8.5",
     "dotenv": "^17.4.2",
@@ -48,5 +48,11 @@
   "bugs": {
     "url": "https://github.com/Yoldis/e-commerce-back-end/issues"
   },
-  "homepage": "https://github.com/Yoldis/e-commerce-back-end#readme"
+  "homepage": "https://github.com/Yoldis/e-commerce-back-end#readme",
+  "allowScripts": {
+    "@prisma/engines@7.9.0": true,
+    "esbuild@0.28.1": true,
+    "prisma@7.9.0": true,
+    "bcrypt@6.0.0": true
+  }
 }
